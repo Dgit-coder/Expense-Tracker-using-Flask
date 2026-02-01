@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styl.css') }}">
+</head>
+<body>
+
+<a href="/logout" class="logout">Logout</a>
+
+<div class="container">
+    <h1>Expense Tracker</h1>
+
+    <!-- ADD EXPENSE -->
+    <form method="POST">
+
+    <!-- Row 1: Inputs -->
+    <div class="form-row inputs-row">
+        <input type="text" name="date" placeholder="DD/MM/YYYY or DD-MM-YY" required>
+        <input type="text" name="name" placeholder="Expense Name" required>
+        <input type="number" name="amount" placeholder="Amount" required>
+    </div>
+
+    <!-- Row 2: Button -->
+    <div class="form-row button-row">
+        <button type="submit">Add Expense</button>
+    </div>
+
+</form>
+
+    <!-- ALL EXPENSES TABLE -->
+    <h2>All Expenses</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Date</th>
+                <th>Expense Name</th>
+                <th>Amount (₹)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in expenses %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ e[1] }}</td>
+                <td>{{ e[2] }}</td>
+                <td>{{ e[3] }}</td>
+                <td>
+                    <a href="/delete/{{ e[0] }}" class="delete">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="3">Total</td>
+                <td colspan="2">₹ {{ total }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- MONTHLY REPORT -->
+    <h2>Monthly Report</h2>
+
+<form method="POST" action="/monthly">
+
+    <!-- Row 1: Inputs -->
+    <div class="form-row inputs-row">
+        <input type="text" name="month" placeholder="MM" required>
+        <input type="text" name="year" placeholder="YYYY" required>
+    </div>
+
+    <!-- Row 2: Button -->
+    <div class="form-row button-row">
+        <button type="submit">Generate</button>
+    </div>
+
+</form>
+
+
+    {% if monthly_expenses is not none %}
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Date</th>
+                <th>Expense Name</th>
+                <th>Amount (₹)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in monthly_expenses %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ m[1] }}</td>
+                <td>{{ m[2] }}</td>
+                <td>{{ m[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="3">Monthly Total</td>
+                <td>₹ {{ monthly_total }}</td>
+            </tr>
+        </tfoot>
+        {% if monthly_expenses|length == 0 %}
+<tr>
+    <td colspan="4">No records found for this month</td>
+</tr>
+{% endif %}
+
+    </table>
+    {% endif %}
+</div>
+<script>
+function formatDate(input) {
+    let value = input.value.replace(/[^0-9]/g, "");
+    
+    if (value.length >= 3 && value.length <= 4)
+        value = value.slice(0,2) + "/" + value.slice(2);
+    else if (value.length >= 5)
+        value = value.slice(0,2) + "/" + value.slice(2,4) + "/" + value.slice(4,8);
+
+    input.value = value;
+}
+</script>
+</body>
+</html>
